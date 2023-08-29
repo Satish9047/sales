@@ -74,7 +74,37 @@ const login = async (req, res)=>{
 }
 
 
+const adminAuth = async (req, res)=>{
+    console.log(req.body);
+
+    const adminAuthSchema = Joi.object({
+        email: Joi.string().email({ minDomainSegments: 2, tlds: { allow: false } }).regex(/^[a-zA-Z0-9._%+-]+@sales\.com$/),
+        password: Joi.string().min(8)
+    })
+
+    try{
+        const value = await adminAuthSchema.validateAsyc(req.body);
+
+        const adminExist = await prisma.User.findFirst({where: {email: value.email}});
+        if(!adminExist){
+            return res.status(400).json({error: "invalid admin!"});
+        }
+        const passwordMatch = await bcrypt.compare(value.password, adminExist.password);
+        if(!passwordMatch){
+            res.status(400).json({error: "invalid admin!"});
+        }
+        const jwtToken = jwt.sign({email: value.email}, secret)
+        return res.status(200).json({success: "login successfull", jwtToken: `${jwtToken}`})
+    } catch(error){
+        return res.status(500).json({error: "something went wrong!"})
+    } finally{
+        await prisma.$disconnect();
+    }
+}
+
+
 module.exports = {
     login,
-    register
+    register,
+    adminAuth
 }

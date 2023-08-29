@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { login, register} = require("../controller/auth.controller")
+const { login, register, adminAuth} = require("../controller/auth.controller");
+const {listAllProducts, addProduct, deleteProduct} = require("../controller/products.controller");
 
 router.get("/", (req, res)=>{
     console.log(req.method, req.url, req.baseUrl);
@@ -8,11 +9,12 @@ router.get("/", (req, res)=>{
 })
 router.post("/register", register);
 router.post("/login", login);
+router.post("/admin/auth", adminAuth);
+router.get("/products", listAllProducts);
+router.post("/addproduct", addProduct);
+router.delete("/deleteproduct/:id", deleteProduct);
 
-router.post("/products", (req, res)=>{
-    console.log(req.body);
-    res.json({success: "this shows all the products"});
-})
+
 
 router.post("/products/:id", (req, res)=>{
     console.log(req.body);
