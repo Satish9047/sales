@@ -34,7 +34,8 @@ const addProduct = async (req, res)=>{
 }
 
 const deleteProduct = async (req, res)=>{
-    console.log(req.params)
+    console.log(req.params);
+    console.lof(req.body);
     
     const schema = Joi.object({
         id: Joi.number().integer().required()
@@ -51,8 +52,38 @@ const deleteProduct = async (req, res)=>{
     }
 }
 
+const updateProduct = async (req, res)=>{
+    console.log(req.params);
+    const updateSchema = Joi.object({
+        id: Joi.number().integer().required(),
+    })
+    const updateSchemaDetail = Joi.object({
+        productName: Joi.string().required(),
+        price: Joi.number().integer().required(),
+        stockQuanity: Joi.number().integer().required(),
+    })
+
+    try{
+        const productId = await updateSchema.validateAsync({id: req.params.id});
+        const value = await updateSchemaDetail.validateAsync(req.body);
+
+        const updateProductItem = await prisma.Product.update({where: {id: productId.id}, data: {
+            productName: value.productName,
+            price: value.price,
+            stockQuanity: value.stockQuanity
+        }});
+        return res.status(200).json({success: "item update successfully"});
+    }catch(error){
+        console.error("something went wrong while updating! :", error);
+        return res.status(500).json({error: "internal server error!"});
+    }finally{
+        await prisma.$disconnect();
+    }
+}
+
 module.exports = {
     listAllProducts,
     addProduct,
-    deleteProduct
+    deleteProduct,
+    updateProduct
 }
