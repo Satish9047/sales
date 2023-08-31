@@ -35,7 +35,7 @@ const addProduct = async (req, res)=>{
 
 const deleteProduct = async (req, res)=>{
     console.log(req.params);
-    console.lof(req.body);
+    console.log(req.body);
     
     const schema = Joi.object({
         id: Joi.number().integer().required()
