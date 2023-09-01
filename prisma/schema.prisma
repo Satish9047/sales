@@ -30,10 +30,11 @@ model Product {
 
 model Order {
   id            Int     @id @default(autoincrement())
-  customer      User    @relation(fields: customerId, references: [id])
   customerId    Int
   orderItem     Product @relation(fields: productItemId, references: [id])
   productItemId Int
   quantity      Int
   price         Int
+  User          User   @relation(fields: [userId], references: [id])
+  userId        Int
 }

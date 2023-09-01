@@ -1,10 +1,27 @@
 const Joi = require("joi");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const jwt = require("jsonwebtoken");
+const secret = process.env.SECRET_JWT;
 
 const listAllProducts = async (req, res)=>{
+
+    console.log(req.headers);
+    const token = req.headers.authorization;
+    const jwtToken = token.split(" ")[1];
+    console.log(jwtToken);
+
+    try{
+        let decoded = jwt.verify(jwtToken, secret);
+        console.log(decoded);
+        return decoded
+    }catch(error){
+        console.log("bad authentication:", error)
+    }
+
+
     const productList = await prisma.Product.findMany({})
-    res.status(200).json({success: "Found list of product", productList});
+    return res.status(200).json({success: "Found list of product", productList});
 }
 
 const addProduct = async (req, res)=>{
